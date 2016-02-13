@@ -1,8 +1,6 @@
 mesos-master:
   hostname: ${MESOS_HOSTNAME}
   image: mrbobbytables/mesos-master:latest
-  labels:
-    io.rancher.container.start_once: true
   restart: always
   environment:
   - ENVIRONMENT=${MESOS_ENVIRONMENT}

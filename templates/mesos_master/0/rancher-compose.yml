@@ -1,6 +1,6 @@
 .catalog:
   name: "Mesosmaster"
-  version: "latest"
+  version: "mesos-0.26.0"
   description: |
     "Mesos Cluster Master"
   uuid: mesosmaster-0
@@ -39,5 +39,5 @@
       type: string
     - variable: MESOS_HOSTNAME
       label: 'Nodename:'
-      default: master-001
+      default: master001
       type: string

@@ -38,6 +38,6 @@
       default: '127.0.0.1:2181,127.0.0.1:2181,127.0.0.1:2181'
       type: string
     - variable: MESOS_HOSTNAME
-      label: 'Nodename:'
+      label: 'Mesos Hostname:'
       default: master001
       type: string

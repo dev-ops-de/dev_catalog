@@ -1,4 +1,4 @@
-name: 'Mesos Master'
+name: 'mesosmaster'
 description: Mesos Cluster Master
 category: Clustering
 version: latest

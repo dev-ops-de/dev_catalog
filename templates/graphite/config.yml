@@ -1,0 +1,5 @@
+name: Graphite
+description: |
+  Graphite server
+version: latest
+category: "Monitoring"

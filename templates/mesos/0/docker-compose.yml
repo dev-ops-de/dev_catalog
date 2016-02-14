@@ -1,96 +1,39 @@
-#
-# Zookeeper
-#
-# https://registry.hub.docker.com/u/jplock/zookeeper/
-#
-zk:
-  image: jplock/zookeeper:3.4.6
-
-#
-# Mesos
-#
-# https://registry.hub.docker.com/u/redjack/mesos-master/
-# http://mesos.apache.org/documentation/latest/configuration/
-#
-master:
-  image: breerly/mesos
-  command: mesos-master
+zookeeper:
+  image: garland/zookeeper
   ports:
-    - "5050:5050"
-  links:
-   - "zk:zookeeper"
-  environment:
-    MESOS_CLUSTER: breerly/fig-mesos
-    MESOS_HOSTNAME: localdocker
-    MESOS_WORK_DIR: /var/lib/mesos
-    MESOS_LOG_DIR: /var/log
-    MESOS_QUORUM: 1
-    MESOS_ZK: zk://zookeeper:2181/mesos
-
-slave1:
-  image: breerly/mesos
-  command: supervisord -n
-  privileged: true
-  links:
-    - "zk:zookeeper"
+   - "2181:2181"
+   - "2888:2888"
+   - "3888:3888"
+mesosmaster:
+  image: garland/mesosphere-docker-mesos-master
   ports:
-    - "5051:5051"
-  environment:
-    MESOS_CONTAINERIZERS: "docker,mesos"
-    MESOS_HOSTNAME: localdocker
-    MESOS_MASTER: zk://zookeeper:2181/mesos
-
-slave2:
-  image: breerly/mesos
-  command: supervisord -n
-  privileged: true
+   - "5050:5050"
   links:
-    - "zk:zookeeper"
-  ports:
-    - "5052:5052"
+   - zookeeper:zk
   environment:
-    MESOS_CONTAINERIZERS: "docker,mesos"
-    MESOS_HOSTNAME: localdocker
-    MESOS_MASTER: zk://zookeeper:2181/mesos
-    MESOS_PORT: "5052"
-
-slave3:
-  image: breerly/mesos
-  command: supervisord -n
-  privileged: true
-  links:
-    - "zk:zookeeper"
-  ports:
-    - "5053:5053"
-  environment:
-    MESOS_CONTAINERIZERS: "docker,mesos"
-    MESOS_HOSTNAME: localdocker
-    MESOS_MASTER: zk://zookeeper:2181/mesos
-    MESOS_PORT: "5053"
-
-#
-# Marathon
-#
-# https://registry.hub.docker.com/u/thefactory/marathon/
-# https://mesosphere.github.io/marathon/docs/command-line-flags.html
-#
+   - MESOS_ZK=zk://zk:2181/mesos
+   - MESOS_LOG_DIR=/var/log/mesos
+   - MESOS_QUORUM=1
+   - MESOS_REGISTRY=in_memory
+   - MESOS_WORK_DIR=/var/lib/mesos
 marathon:
-  image: superguenter/marathon
-  ports:
-    - "8080:8080"
+  image: garland/mesosphere-docker-marathon
   links:
-    - "zk:zookeeper"
-  command: "--master zk://zookeeper:2181/mesos --zk zk://zookeeper:2181/marathon"
-
-#
-# Chronos
-#
-# https://registry.hub.docker.com/u/tomaskral/chronos/
-#
-chronos:
-  image: tomaskral/chronos
+   - zookeeper:zk
+   - mesosmaster:master
+  command: --master zk://zk:2181/mesos --zk zk://zk:2181/marathon
   ports:
-    - "4400:8080"
+   - "8080:8080"
+mesosslave:
+  image: garland/mesosphere-docker-mesos-master:latest
+  ports:
+   - "5051:5051"
   links:
-    - "zk:zookeeper"
-  command: "--master zk://zookeeper:2181/mesos --zk_hosts zk://zookeeper:2181/mesos"
+   - zookeeper:zk
+   - mesosmaster:master
+  entrypoint: mesos-slave
+  environment:
+   - MESOS_HOSTNAME=192.168.33.10
+   - MESOS_MASTER=zk://zk:2181/mesos
+   - MESOS_LOG_DIR=/var/log/mesos
+   - MESOS_LOGGING_LEVEL=INFO

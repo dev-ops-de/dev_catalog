@@ -1,5 +1,5 @@
-name: Mesos Cluster
+name: Mesos Single Node Setup
 description: |
-  Mesos Cluster
+  Mesos Single Node Setup
 version: latest
-category: Administration
+category: Clustering
